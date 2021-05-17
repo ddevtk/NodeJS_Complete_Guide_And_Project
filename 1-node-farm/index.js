@@ -31,18 +31,17 @@ console.log('Write this file');
  */
 
 const replaceTemplate = (temp, product) => {
-  let output = temp.replace('NAME', product.productName);
-  output = output.replace('@IMAGE', product.image);
-  output = output.replace('@PRICE', product.price);
-  output = output.replace('@IMAGE', product.image);
-  output = output.replace('@FROM', product.from);
-  output = output.replace('@NUTRIENTS', product.nutrients);
-  output = output.replace('@ID', product.id);
-  output = output.replace('@QUANTITY', product.quantity);
-  output = output.replace('@DESCRIPTION', product.description);
+  let output = temp.split('@NAME').join(product.productName);
+  output = output.split('@IMAGE').join(product.image);
+  output = output.split('@PRICE').join(product.price);
+  output = output.split('@FROM').join(product.from);
+  output = output.split('@NUTRIENTS').join(product.nutrients);
+  output = output.split('@ID').join(product.id);
+  output = output.split('@QUANTITY').join(product.quantity);
+  output = output.split('@DESCRIPTION').join(product.description);
 
   if (!product.organic) {
-    output = output.replace('@NOT_ORGANIC', 'not-organic');
+    output = output.split('@NOT_ORGANIC').join('not-organic');
   }
 
   return output;
@@ -63,13 +62,12 @@ const tempCard = fs.readFileSync(
 
 const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
 const productData = JSON.parse(data);
-console.log(productData);
 
 const server = http.createServer((req, res) => {
-  const pathName = req.url;
+  const { pathname, query } = url.parse(req.url, true);
 
   // OVERVIEW
-  if (pathName === '/' || pathName === '/overview') {
+  if (pathname === '/' || pathname === '/overview') {
     res.writeHead(200, { 'Content-type': 'text/html' });
 
     const cardHtml = productData
@@ -79,11 +77,16 @@ const server = http.createServer((req, res) => {
     res.end(output);
 
     // PRODUCT
-  } else if (pathName === '/product') {
-    res.end('this.is product page');
+  } else if (pathname === '/product') {
+    res.writeHead(200, { 'Content-type': 'text/html' });
+
+    const productItem = productData[query.id];
+
+    const output = replaceTemplate(tempProduct, productItem);
+    res.end(output);
 
     // API
-  } else if (pathName === '/api') {
+  } else if (pathname === '/api') {
     res.writeHead(200, {
       'Content-type': 'application/json',
     });
