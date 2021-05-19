@@ -1,6 +1,9 @@
 const fs = require('fs');
 const http = require('http');
 const url = require('url');
+const slugify = require('slugify');
+
+const replaceTemplate = require('./modules/replaceTemplate');
 
 /*
 // blocking, synchronous way
@@ -30,23 +33,6 @@ fs.writeFileSync('./txt/output.txt', textOut);
 console.log('Write this file');
  */
 
-const replaceTemplate = (temp, product) => {
-  let output = temp.split('@NAME').join(product.productName);
-  output = output.split('@IMAGE').join(product.image);
-  output = output.split('@PRICE').join(product.price);
-  output = output.split('@FROM').join(product.from);
-  output = output.split('@NUTRIENTS').join(product.nutrients);
-  output = output.split('@ID').join(product.id);
-  output = output.split('@QUANTITY').join(product.quantity);
-  output = output.split('@DESCRIPTION').join(product.description);
-
-  if (!product.organic) {
-    output = output.split('@NOT_ORGANIC').join('not-organic');
-  }
-
-  return output;
-};
-
 const tempOverview = fs.readFileSync(
   `${__dirname}/templates/template-overview.html`,
   'utf-8'
@@ -62,6 +48,11 @@ const tempCard = fs.readFileSync(
 
 const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
 const productData = JSON.parse(data);
+
+const productNameLower = productData.map(product =>
+  slugify(product.productName, { lower: true })
+);
+console.log(productNameLower);
 
 const server = http.createServer((req, res) => {
   const { pathname, query } = url.parse(req.url, true);
