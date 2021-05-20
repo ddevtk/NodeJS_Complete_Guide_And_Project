@@ -8,7 +8,6 @@ const app = express();
 
 // MIDDLEWARE
 app.use(express.json());
-
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   res.message = `created at ${new Date().getDay()}`;
@@ -17,13 +16,7 @@ app.use((req, res, next) => {
 
 //////////////////////
 // ROUTES
-
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/user', userRouter);
 
-////////////////////////
-///   SERVER
-const port = 3000;
-app.listen(port, () => {
-  console.log(`App running on port ${port}`);
-});
+module.exports = app;
