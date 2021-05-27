@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "nodemon server.js",
-    "start:prod": "NODE_ENV=product"
+    "start:prod": "NODE_ENV=product",
+    "debug": "ndb server.js"
   },
   "author": "ddevtk",
   "license": "ISC",
@@ -17,5 +18,8 @@
     "nodemon": "^2.0.7",
     "slugify": "^1.5.3",
     "validator": "^13.6.0"
+  },
+  "devDependencies": {
+    "ndb": "^1.1.5"
   }
 }
