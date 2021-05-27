@@ -1,15 +1,38 @@
+const appError = require('../utils/appError');
+
+// Handle error DB
+const errorDBHandler = (err) => {
+  console.log('Error');
+  const message = `Invalid ${err.path}: ${err.value}`;
+  return new appError(message, 400);
+};
+
+// Handle duplicate error DB
+const errorDuplicateHandler = (err) => {
+  // const value = err.errmsg.match(/(["'])(?:(?=(\\?))\2.)*?\1/)[0];
+
+  const message = `Duplicate field value: " ${err.keyValue.name} ". Please use another value !!!`;
+  return new appError(message, 400);
+};
+// Handle validation error DB
+const errorValidationHandler = (err) => {
+  const errors = Object.values(err.errors).map((el) => el.message);
+  const message = `Invalid input data: ${errors.join('. ')}`;
+  return new appError(message, 400);
+};
+
 // Error with env = development
-const errorDev = (res, err) => {
+const errorDev = (err, res) => {
   res.status(err.statusCode).json({
-    error: err,
-    stack: err.stack,
     status: err.status,
+    error: err,
     message: err.message,
+    stack: err.stack,
   });
 };
 
-// Error with env = product
-const errorProduct = (res, err) => {
+// Error with env = production
+const errorProduct = (err, res) => {
   // Operational Error
   if (err.isOperational) {
     res.status(err.statusCode).json({
@@ -35,8 +58,20 @@ module.exports = (err, req, res, next) => {
   err.status = err.status || 'error';
 
   if (process.env.NODE_ENV === 'development') {
-    errorDev(res, err);
+    errorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
-    errorProduct(res, err);
+    let error = { ...err };
+
+    if (err.name === 'CastError') {
+      error = errorDBHandler(err);
+    }
+    if (err.code === 11000) {
+      error = errorDuplicateHandler(err);
+    }
+    if (err.name === 'ValidationError') {
+      error = errorValidationHandler(err);
+    }
+
+    errorProduct(error, res);
   }
 };

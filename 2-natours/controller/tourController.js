@@ -14,9 +14,12 @@ module.exports.aliasTopTours = (req, res, next) => {
 
 //////////////////////
 // CREATE NEW TOUR
-
 module.exports.createNewTour = catchAsyncFn(async (req, res, next) => {
   const newTour = await Tour.create(req.body);
+
+  // if (!tour) {
+  //   return next(new appError('No tour found with that ID !!!', 404));
+  // }
 
   res.status(201).json({
     status: 'success',
@@ -80,6 +83,7 @@ module.exports.updateTour = catchAsyncFn(async (req, res, next) => {
   if (!tour) {
     return next(new appError('No tour found with that ID !!!', 404));
   }
+
   res.status(200).json({
     status: 'success',
     data: {
@@ -92,9 +96,11 @@ module.exports.updateTour = catchAsyncFn(async (req, res, next) => {
 // DELETE TOUR
 module.exports.deleteTour = catchAsyncFn(async (req, res, next) => {
   const tour = await Tour.findByIdAndDelete(req.params.id);
+
   if (!tour) {
     return next(new appError('No tour found with that ID !!!', 404));
   }
+
   res.status(204).json({
     status: 'success',
     data: null,
