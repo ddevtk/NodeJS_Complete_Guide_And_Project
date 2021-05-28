@@ -1,6 +1,6 @@
 const appError = require('../utils/appError');
 
-// Handle error DB
+// Handle invalid DB IDs
 const errorDBHandler = (err) => {
   console.log('Error');
   const message = `Invalid ${err.path}: ${err.value}`;
