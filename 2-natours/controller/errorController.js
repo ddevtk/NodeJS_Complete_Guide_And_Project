@@ -2,7 +2,6 @@ const appError = require('../utils/appError');
 
 // Handle invalid DB IDs
 const errorDBHandler = (err) => {
-  console.log('Error');
   const message = `Invalid ${err.path}: ${err.value}`;
   return new appError(message, 400);
 };
@@ -10,6 +9,7 @@ const errorDBHandler = (err) => {
 // Handle duplicate error DB
 const errorDuplicateHandler = (err) => {
   // const value = err.errmsg.match(/(["'])(?:(?=(\\?))\2.)*?\1/)[0];
+  console.log(err);
 
   const message = `Duplicate field value: " ${err.keyValue.name} ". Please use another value !!!`;
   return new appError(message, 400);
