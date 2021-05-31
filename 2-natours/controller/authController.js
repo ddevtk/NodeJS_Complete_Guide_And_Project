@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { promisify } = require('util');
 const app = require('../app');
 const User = require('../model/userModel');
 const appError = require('../utils/appError');
@@ -8,7 +9,7 @@ const { token } = require('morgan');
 
 const getToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
+    expiresIn: '90d',
   });
 };
 
@@ -18,6 +19,7 @@ module.exports.signup = catchAsyncFn(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
+    passwordChangedAt: req.body.passwordChangedAt,
   });
 
   const token = getToken(newUser._id);
@@ -49,4 +51,42 @@ exports.login = catchAsyncFn(async (req, res, next) => {
     status: 'success',
     token,
   });
+});
+
+exports.protect = catchAsyncFn(async (req, res, next) => {
+  let token;
+  let headers = req.headers;
+
+  // 1) Getting token and check of it is here
+  if (headers.authorization && headers.authorization.startsWith('Bearer')) {
+    token = headers.authorization.split(' ')[1];
+  }
+
+  if (!token) {
+    return next(
+      new appError('You are not logged in! Please to login to get access', 401)
+    );
+  }
+
+  // 2) Verification token
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+  // 3) Check if user still exists
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
+    return next(
+      new appError('The token belonging to this user no longer exists', 401)
+    );
+  }
+
+  // 4) Check if user changed password after the token was issue
+  if (currentUser.checkPasswordHasChanged(decoded.iat)) {
+    return next(
+      new appError('User recently has been changed. Please login again', 401)
+    );
+  }
+  // ACCESS TO PROTECTED ROUTE
+  req.user = currentUser;
+
+  next();
 });

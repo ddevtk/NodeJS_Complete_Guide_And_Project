@@ -9,7 +9,6 @@ const errorDBHandler = (err) => {
 // Handle duplicate error DB
 const errorDuplicateHandler = (err) => {
   // const value = err.errmsg.match(/(["'])(?:(?=(\\?))\2.)*?\1/)[0];
-  console.log(err);
 
   const message = `Duplicate field value: " ${err.keyValue.name} ". Please use another value !!!`;
   return new appError(message, 400);
@@ -20,6 +19,14 @@ const errorValidationHandler = (err) => {
   const message = `Invalid input data: ${errors.join('. ')}`;
   return new appError(message, 400);
 };
+
+// Handle JWT error
+const errorJWTHandler = () =>
+  new appError('Invalid token. Please login again !', 401);
+
+// Handle expired Token error
+const tokenExpiredErrorHandler = () =>
+  new appError('Your token is expired! Please login again !', 401);
 
 // Error with env = development
 const errorDev = (err, res) => {
@@ -70,6 +77,13 @@ module.exports = (err, req, res, next) => {
     }
     if (err.name === 'ValidationError') {
       error = errorValidationHandler(err);
+    }
+    if (err.name === 'JsonWebTokenError') {
+      error = errorJWTHandler();
+    }
+
+    if (err.name === 'TokenExpiredError') {
+      error = tokenExpiredErrorHandler();
     }
 
     errorProduct(error, res);
