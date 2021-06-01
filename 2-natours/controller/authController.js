@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
+const crypto = require('crypto');
 const app = require('../app');
 const User = require('../model/userModel');
 const appError = require('../utils/appError');
@@ -111,17 +112,13 @@ exports.forgotPassword = catchAsyncFn(async (req, res, next) => {
   if (!user) {
     return next(new appError('There is no user with this email address ', 404));
   }
-  console.log(req.protocol);
-  console.log(req);
 
   // 2) Gen randomResetToken
   const resetToken = user.getPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
   // 3) Send randomResetToken to user 's email
-  const resetURL = `${req.protocol}://${req.get(
-    'host'
-  )}/api/v1/users/resetPassword/${resetToken}`;
+  const resetURL = `${req.protocol}://127.0.0.1:8000/api/v1/users/resetPassword/${resetToken}`;
 
   const message = `Forgot your password? Submit request with new password and confirmPassword to: ${resetURL}\n. If you don't forget your password, please ignore this email.`;
 
@@ -149,5 +146,32 @@ exports.forgotPassword = catchAsyncFn(async (req, res, next) => {
 });
 
 exports.resetPassword = catchAsyncFn(async (req, res, next) => {
-  next();
+  // 1) Get user by token and check passwordReset is not expired
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+  // 2) Check if user exists and update password
+  if (!user) {
+    return next(new appError('Token is invalid or has expired', 400));
+  }
+  user.password = req.body.password;
+  user.confirmPassword = req.body.confirmPassword;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+
+  // Send token and get access to protected route
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: '90d',
+  });
+  res.status(200).json({
+    status: 'success',
+    token,
+  });
 });
