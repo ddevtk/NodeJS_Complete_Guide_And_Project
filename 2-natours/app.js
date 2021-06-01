@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
+const { forgotPassword } = require('./controller/authController');
 
 const globalErrorHandler = require('./controller/errorController');
 const tourRouter = require('./routes/tourRoute');
