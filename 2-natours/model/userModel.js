@@ -46,15 +46,15 @@ userSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password, 12);
 
   this.confirmPassword = undefined;
+
+  next();
+});
+userSchema.pre('save', function (next) {
+  if (this.isModified('password') || this.isNew) return next();
+
   this.passwordChangedAt = Date.now();
   next();
 });
-userSchema.methods.isCorrectPassword = async function (
-  candidatePassword,
-  userPassword
-) {
-  return await bcrypt.compare(candidatePassword, userPassword);
-};
 
 userSchema.methods.checkPasswordHasChanged = function (JWTimestamp) {
   if (this.passwordChangedAt) {

@@ -21,7 +21,7 @@ module.exports.signup = catchAsyncFn(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
-    passwordChangedAt: req.body.passwordChangedAt,
+    // passwordChangedAt: req.body.passwordChangedAt,
   });
 
   const token = getToken(newUser._id);
@@ -80,6 +80,7 @@ exports.protect = catchAsyncFn(async (req, res, next) => {
       new appError('The token belonging to this user no longer exists', 401)
     );
   }
+  console.log(currentUser);
 
   // 4) Check if user changed password after the token was issue
   if (currentUser.checkPasswordHasChanged(decoded.iat)) {
@@ -168,6 +169,30 @@ exports.resetPassword = catchAsyncFn(async (req, res, next) => {
 
   // Send token and get access to protected route
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: '90d',
+  });
+  res.status(200).json({
+    status: 'success',
+    token,
+  });
+});
+
+exports.updatePassword = catchAsyncFn(async (req, res, next) => {
+  // 1) Get user from collection
+  const currentUser = await User.findById(req.user._id).select('+password');
+
+  console.log(currentUser);
+  // 2) Check if POSTed password is correct
+  if (!(await bcrypt.compare(req.body.currentPassword, currentUser.password))) {
+    return next(new appError('Incorrect password. Please check again', 401));
+  }
+  // 3) Update password
+  currentUser.password = req.body.newPassword;
+  currentUser.confirmPassword = req.body.confirmPassword;
+  await currentUser.save();
+
+  // 4) Send jwt
+  const token = jwt.sign({ id: currentUser._id }, process.env.JWT_SECRET, {
     expiresIn: '90d',
   });
   res.status(200).json({
