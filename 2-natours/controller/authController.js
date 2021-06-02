@@ -15,6 +15,30 @@ const getToken = (id) => {
   });
 };
 
+const sendToken = (res, statusCode, user) => {
+  const token = getToken(user._id);
+
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+  };
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+
+  res.cookie('jwt', token, cookieOptions);
+
+  user.password = undefined;
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 module.exports.signup = catchAsyncFn(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -24,15 +48,7 @@ module.exports.signup = catchAsyncFn(async (req, res, next) => {
     // passwordChangedAt: req.body.passwordChangedAt,
   });
 
-  const token = getToken(newUser._id);
-
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  sendToken(res, 201, newUser);
 });
 exports.login = catchAsyncFn(async (req, res, next) => {
   // Check if email and password exist
@@ -49,10 +65,7 @@ exports.login = catchAsyncFn(async (req, res, next) => {
 
   const token = getToken(user._id);
 
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  sendToken(res, 200, user);
 });
 
 exports.protect = catchAsyncFn(async (req, res, next) => {
@@ -110,6 +123,7 @@ exports.restrictTo = (...roles) => {
 exports.forgotPassword = catchAsyncFn(async (req, res, next) => {
   // 1) Get user by POSTED email
   const user = await User.findOne({ email: req.body.email });
+  console.log(user);
   if (!user) {
     return next(new appError('There is no user with this email address ', 404));
   }
@@ -168,13 +182,7 @@ exports.resetPassword = catchAsyncFn(async (req, res, next) => {
   await user.save();
 
   // Send token and get access to protected route
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: '90d',
-  });
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  sendToken(res, 200, user);
 });
 
 exports.updatePassword = catchAsyncFn(async (req, res, next) => {
@@ -192,11 +200,5 @@ exports.updatePassword = catchAsyncFn(async (req, res, next) => {
   await currentUser.save();
 
   // 4) Send jwt
-  const token = jwt.sign({ id: currentUser._id }, process.env.JWT_SECRET, {
-    expiresIn: '90d',
-  });
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  sendToken(res, 200, currentUser);
 });
