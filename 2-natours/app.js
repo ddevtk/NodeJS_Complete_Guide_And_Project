@@ -2,6 +2,9 @@ const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const hpp = require('hpp');
 
 const globalErrorHandler = require('./controller/errorController');
 const tourRouter = require('./routes/tourRoute');
@@ -32,6 +35,25 @@ app.use('/api', limiter);
 
 // 3) Body parser, reading data from body to req.body
 app.use(express.json({ limit: '10kb' }));
+
+// Data sanitization against NoSQL injection
+app.use(mongoSanitize());
+
+// Data sanitization against XSS
+app.use(xss());
+
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'difficulty',
+      'maxGroupSize',
+      'price',
+    ],
+  })
+);
 
 // 4) Serving static files
 app.use(express.static(`${__dirname}/public`));
