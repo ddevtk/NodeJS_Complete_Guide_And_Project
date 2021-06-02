@@ -93,7 +93,6 @@ exports.protect = catchAsyncFn(async (req, res, next) => {
       new appError('The token belonging to this user no longer exists', 401)
     );
   }
-  console.log(currentUser);
 
   // 4) Check if user changed password after the token was issue
   if (currentUser.checkPasswordHasChanged(decoded.iat)) {
