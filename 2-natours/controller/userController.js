@@ -39,6 +39,7 @@ module.exports.deleteUser = (req, res) => {
   });
 };
 
+// UPDATE USER'S DATA
 exports.updateMe = catchAsyncFn(async (req, res, next) => {
   if (req.body.password || req.body.confirmPassword) {
     return next(
@@ -67,5 +68,15 @@ exports.updateMe = catchAsyncFn(async (req, res, next) => {
     data: {
       user: updateUser,
     },
+  });
+});
+
+// DELETE USER
+exports.deleteMe = catchAsyncFn(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+
+  res.status(204).json({
+    status: 'success',
+    data: null,
   });
 });

@@ -35,11 +35,17 @@ const userSchema = new mongoose.Schema({
       message: 'Passwords are not the same',
     },
   },
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
   passwordChangedAt: { type: Date },
   passwordResetToken: String,
   passwordResetExpires: Date,
 });
 
+// DOCUMENT MIDDLEWARE
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
 
@@ -56,6 +62,13 @@ userSchema.pre('save', function (next) {
   next();
 });
 
+// QUERY MIDDLEWARE
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
+  next();
+});
+
+// CREATE METHODS IN DOCS
 userSchema.methods.checkPasswordHasChanged = function (JWTimestamp) {
   if (this.passwordChangedAt) {
     console.log(this.passwordChangedAt.getTime() / 1000, JWTimestamp);
