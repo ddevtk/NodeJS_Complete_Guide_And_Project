@@ -805,6 +805,12 @@ body {
   -ms-flex-pack: justify;
   justify-content: space-between;
 }
+.footer .copyright {
+  text-decoration: none;
+  color: rgb(36, 33, 33);
+  font-size: 1.6rem;
+  font-weight: 400;
+}
 @media only screen and (max-width: 50em) {
   .footer {
     grid-template-columns: 1fr;
@@ -830,6 +836,7 @@ body {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  justify-content: flex-end;
 }
 .footer__nav li {
   margin-left: 1.5rem;

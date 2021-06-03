@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
@@ -9,23 +10,30 @@ const hpp = require('hpp');
 const globalErrorHandler = require('./controller/errorController');
 const tourRouter = require('./routes/tourRoute');
 const userRouter = require('./routes/userRoute');
+const viewRouter = require('./routes/viewRoute');
 const appError = require('./utils/appError');
 
 const app = express();
 
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
 // MIDDLEWARE
 
-// 1) Set security HTTP headers
+//  Serving static files
+app.use(express.static(path.join(__dirname, 'public')));
+
+//  Set security HTTP headers
 app.use(helmet());
 
-// 2) Development logging
+//  Development logging
 if (process.env.NODE_ENV === 'development') {
   if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
   }
 }
 
-// 2) Limit requests from same IP
+//  Limit requests from same IP
 const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
@@ -33,7 +41,7 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// 3) Body parser, reading data from body to req.body
+//  Body parser, reading data from body to req.body
 app.use(express.json({ limit: '10kb' }));
 
 // Data sanitization against NoSQL injection
@@ -55,10 +63,7 @@ app.use(
   })
 );
 
-// 4) Serving static files
-app.use(express.static(`${__dirname}/public`));
-
-// 5) Test middleware
+//  Test middleware
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   res.message = `created at ${new Date().getDay()}`;
@@ -67,6 +72,8 @@ app.use((req, res, next) => {
 
 //////////////////////
 // ROUTES
+
+app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
