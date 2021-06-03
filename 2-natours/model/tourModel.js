@@ -45,6 +45,7 @@ const tourSchema = new mongoose.Schema(
       default: 4.5,
       min: [1.0, 'A rating must be above 1.0'],
       max: [5.0, 'A rating must be below 5.0'],
+      set: (val) => Math.round(val * 10) / 10,
     },
     ratingsQuantity: {
       type: Number,
@@ -64,6 +65,7 @@ const tourSchema = new mongoose.Schema(
         message: 'Discount price ({VALUE}) must be below regular price',
       },
     },
+
     summary: {
       type: String,
       trim: true,
@@ -81,14 +83,49 @@ const tourSchema = new mongoose.Schema(
     createdAt: {
       type: Date,
       default: Date.now(),
+      select: false,
     },
+    startLocation: {
+      // GeoJSON
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
     startDates: [Date],
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }
 );
+
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+tourSchema.index({ slug: 1 });
+tourSchema.index({ startLocation: '2dsphere' });
 
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
