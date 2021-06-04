@@ -63,8 +63,6 @@ exports.login = catchAsyncFn(async (req, res, next) => {
     return next(new appError('Incorrect email or password', 401));
   }
 
-  const token = getToken(user._id);
-
   sendToken(res, 200, user);
 });
 
@@ -122,7 +120,7 @@ exports.restrictTo = (...roles) => {
 exports.forgotPassword = catchAsyncFn(async (req, res, next) => {
   // 1) Get user by POSTED email
   const user = await User.findOne({ email: req.body.email });
-  console.log(user);
+
   if (!user) {
     return next(new appError('There is no user with this email address ', 404));
   }

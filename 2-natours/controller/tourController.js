@@ -15,82 +15,12 @@ module.exports.aliasTopTours = (req, res, next) => {
 
 //////////////////////
 // CREATE NEW TOUR
-module.exports.createNewTour = catchAsyncFn(async (req, res, next) => {
-  const newTour = await Tour.create(req.body);
-
-  // if (!tour) {
-  //   return next(new appError('No tour found with that ID !!!', 404));
-  // }
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      newTour,
-    },
-  });
-});
 
 /////////////////////
 // GET ALL TOUR
-module.exports.getAllTour = catchAsyncFn(async (req, res, next) => {
-  // Execute query
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .paginate()
-    .limitedField()
-    .sort();
-  const tours = await features.query;
-
-  // Send data response
-  res.status(200).json({
-    status: 'success',
-    results: tours.length,
-    data: {
-      tours,
-    },
-  });
-});
 
 /////////////////////
 // GET TOUR
-module.exports.getTour = catchAsyncFn(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id).populate('reviews');
-
-  if (!tour) {
-    return next(new appError('No tour found with that ID !!!', 404));
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
-});
-
-/////////////////////
-// UPDATE TOUR
-module.exports.updateTour = catchAsyncFn(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-
-  if (!tour) {
-    return next(new appError('No tour found with that ID !!!', 404));
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
-});
-
-/////////////////////
-// DELETE TOUR
-exports.deleteTour = handlerFactory.deleteOne(Tour);
 
 ///////////////////
 // GET TOUR STATS
@@ -159,3 +89,9 @@ exports.getMonthlyPlan = catchAsyncFn(async (req, res, next) => {
     },
   });
 });
+
+module.exports.getAllTour = handlerFactory.getAll(Tour);
+module.exports.getTour = handlerFactory.getOne(Tour, { path: 'reviews' });
+module.exports.createNewTour = handlerFactory.createOne(Tour);
+exports.updateTour = handlerFactory.updateOne(Tour);
+exports.deleteTour = handlerFactory.deleteOne(Tour);

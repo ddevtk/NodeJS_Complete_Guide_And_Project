@@ -8,8 +8,6 @@ class APIFeatures {
     const queryObj = { ...this.queryString };
     const excludedFields = ['sort', 'page', 'fields', 'limit'];
 
-    console.log(typeof queryObj);
-
     excludedFields.forEach((field) => delete queryObj[field]);
 
     // 1b) Advance filtering
