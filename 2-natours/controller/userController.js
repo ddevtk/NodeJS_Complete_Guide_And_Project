@@ -1,6 +1,7 @@
 const User = require('../model/userModel');
 const appError = require('../utils/appError');
 const catchAsyncFn = require('../utils/catchAsyncFn');
+const handlerFactory = require('./handlerFactory');
 
 module.exports.getAllUsers = catchAsyncFn(async (req, res, next) => {
   const users = await User.find();
@@ -32,12 +33,7 @@ module.exports.updateUser = (req, res) => {
     message: 'this route is not yet defined',
   });
 };
-module.exports.deleteUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'this route is not yet defined',
-  });
-};
+module.exports.deleteUser = handlerFactory.deleteOne(User);
 
 // UPDATE USER'S DATA
 exports.updateMe = catchAsyncFn(async (req, res, next) => {

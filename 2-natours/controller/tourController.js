@@ -2,6 +2,7 @@ const Tour = require('../model/tourModel');
 const APIFeatures = require('../utils/APIFeatures');
 const appError = require('../utils/appError');
 const catchAsyncFn = require('../utils/catchAsyncFn');
+const handlerFactory = require('./handlerFactory');
 
 //////////////////////
 // ALIAS TOP TOUR
@@ -89,18 +90,7 @@ module.exports.updateTour = catchAsyncFn(async (req, res, next) => {
 
 /////////////////////
 // DELETE TOUR
-module.exports.deleteTour = catchAsyncFn(async (req, res, next) => {
-  const tour = await Tour.findByIdAndDelete(req.params.id);
-
-  if (!tour) {
-    return next(new appError('No tour found with that ID !!!', 404));
-  }
-
-  res.status(204).json({
-    status: 'success',
-    data: null,
-  });
-});
+exports.deleteTour = handlerFactory.deleteOne(Tour);
 
 ///////////////////
 // GET TOUR STATS

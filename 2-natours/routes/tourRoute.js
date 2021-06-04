@@ -26,13 +26,6 @@ router
   )
   .patch(tourController.updateTour);
 
-// router
-//   .route('/:tourId/review')
-//   .post(
-//     authController.protect,
-//     authController.restrictTo('user'),
-//     reviewController.createNewReview
-//   );
 router.use('/:tourId/reviews', reviewRouter);
 
 module.exports = router;
