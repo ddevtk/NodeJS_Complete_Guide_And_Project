@@ -40,10 +40,6 @@ module.exports.getAllTour = catchAsyncFn(async (req, res, next) => {
     .sort();
   const tours = await features.query;
 
-  // if (!tour) {
-  //   return next(new appError('No tour found with that ID !!!', 404));
-  // }
-
   // Send data response
   res.status(200).json({
     status: 'success',
@@ -57,8 +53,7 @@ module.exports.getAllTour = catchAsyncFn(async (req, res, next) => {
 /////////////////////
 // GET TOUR
 module.exports.getTour = catchAsyncFn(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id);
-  //Tour.findOne({_id: req.params.id})
+  const tour = await Tour.findById(req.params.id).populate('reviews');
 
   if (!tour) {
     return next(new appError('No tour found with that ID !!!', 404));
