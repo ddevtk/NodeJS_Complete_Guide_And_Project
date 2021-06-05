@@ -3,13 +3,6 @@ const appError = require('../utils/appError');
 const catchAsyncFn = require('../utils/catchAsyncFn');
 const handlerFactory = require('./handlerFactory');
 
-module.exports.createNewUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'this route is not yet defined',
-  });
-};
-
 // UPDATE USER'S DATA
 exports.updateMe = catchAsyncFn(async (req, res, next) => {
   if (req.body.password || req.body.confirmPassword) {
@@ -51,6 +44,11 @@ exports.deleteMe = catchAsyncFn(async (req, res, next) => {
     data: null,
   });
 });
+
+module.exports.getMe = (req, res, next) => {
+  req.params.id = req.user._id;
+  next();
+};
 
 module.exports.getAllUsers = handlerFactory.getAll(User);
 module.exports.getUser = handlerFactory.getOne(User);

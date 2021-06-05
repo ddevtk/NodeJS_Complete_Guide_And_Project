@@ -5,11 +5,13 @@ const reviewController = require('../controller/reviewController');
 
 const router = express.Router({ mergeParams: true });
 
+// PROTECT ROUTES IF USER NOT LOGGED IN
+router.use(authController.protect);
+
 router
   .route('/')
   .get(reviewController.getAllReviews)
   .post(
-    authController.protect,
     authController.restrictTo('user'),
     reviewController.checkTourId,
     reviewController.createNewReview
@@ -18,7 +20,13 @@ router
 router
   .route('/:id')
   .get(reviewController.getReview)
-  .delete(reviewController.deleteReview)
-  .patch(reviewController.updateReview);
+  .delete(
+    authController.restrictTo('admin', 'user'),
+    reviewController.deleteReview
+  )
+  .patch(
+    authController.restrictTo('admin', 'user'),
+    reviewController.updateReview
+  );
 
 module.exports = router;

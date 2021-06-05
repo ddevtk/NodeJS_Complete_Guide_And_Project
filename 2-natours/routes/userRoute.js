@@ -5,22 +5,21 @@ const userController = require('../controller/userController');
 const router = express.Router();
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
-
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
-router.patch(
-  '/updatePassword',
-  authController.protect,
-  authController.updatePassword
-);
 
-router.patch('/updateMe', authController.protect, userController.updateMe);
-router.patch('/deleteMe', authController.protect, userController.deleteMe);
+// PROTECT ROUTES IF USER IS NOT LOGGED IN
+router.use(authController.protect);
 
-router
-  .route('/')
-  .get(userController.getAllUsers)
-  .post(userController.createNewUser);
+router.patch('/updatePassword', authController.updatePassword);
+router.get('/me', userController.getMe, userController.getUser);
+router.patch('/updateMe', userController.updateMe);
+router.patch('/deleteMe', userController.deleteMe);
+
+// ONLY ADMIN CAN ACCESS THE ROUTES BELOW
+router.use(authController.restrictTo('admin'));
+
+router.route('/').get(userController.getAllUsers);
 router
   .route('/:id')
   .get(userController.getUser)
