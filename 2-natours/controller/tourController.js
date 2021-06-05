@@ -13,18 +13,6 @@ module.exports.aliasTopTours = (req, res, next) => {
   next();
 };
 
-//////////////////////
-// CREATE NEW TOUR
-
-/////////////////////
-// GET ALL TOUR
-
-/////////////////////
-// GET TOUR
-
-///////////////////
-// GET TOUR STATS
-
 module.exports.getTourStats = catchAsyncFn(async (req, res, next) => {
   const stats = await Tour.aggregate([
     { $match: { ratingsAverage: { $gte: 4.5 } } },

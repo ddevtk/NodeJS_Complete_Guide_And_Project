@@ -2,8 +2,8 @@ const Review = require('../model/reviewModel');
 const handlerFactory = require('./handlerFactory');
 
 exports.checkTourId = (req, res, next) => {
-  if (!req.body.tours) req.body.tours = req.params.tourId;
-  if (!req.body.users) req.body.users = req.user._id;
+  if (!req.body.tours) req.body.tour = req.params.tourId;
+  if (!req.body.users) req.body.user = req.user._id;
 
   next();
 };
