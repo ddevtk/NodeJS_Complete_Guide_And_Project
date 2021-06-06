@@ -79,7 +79,6 @@ exports.getMonthlyPlan = catchAsyncFn(async (req, res, next) => {
 });
 
 module.exports.getToursWithin = catchAsyncFn(async (req, res, next) => {
-  console.log(req.params);
   const { distance, latlng, unit } = req.params;
   const [lat, lng] = latlng.split(',');
   if (!lat || !lng)
@@ -96,6 +95,38 @@ module.exports.getToursWithin = catchAsyncFn(async (req, res, next) => {
     result: tours.length,
     data: {
       tours,
+    },
+  });
+});
+
+exports.getDistances = catchAsyncFn(async (req, res, next) => {
+  console.log(req.params);
+  const { latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(',');
+  if (!lat || !lng)
+    return next(
+      new appError('Please provide your position ( latitude, longitude )', 400)
+    );
+
+  const multiplier = unit === 'mi' ? 0.000621371192 : 0.001;
+
+  const distance = await Tour.aggregate([
+    {
+      $geoNear: {
+        near: { type: 'Point', coordinates: [lng * 1, lat * 1] },
+        distanceField: 'distance',
+        distanceMultiplier: multiplier,
+      },
+    },
+    {
+      $project: { distance: 1, name: 1 },
+    },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      distance,
     },
   });
 });
