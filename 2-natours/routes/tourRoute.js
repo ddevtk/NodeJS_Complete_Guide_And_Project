@@ -5,6 +5,8 @@ const reviewRouter = require('../routes/reviewRoute');
 
 const router = express.Router();
 
+router.use('/:tourId/reviews', reviewRouter);
+
 router
   .route('/tours-within/:distance/center/:latlng/unit/:unit')
   .get(tourController.getToursWithin);
@@ -44,7 +46,5 @@ router
     authController.restrictTo('admin', 'lead-guide'),
     tourController.updateTour
   );
-
-router.use('/:tourId/reviews', reviewRouter);
 
 module.exports = router;

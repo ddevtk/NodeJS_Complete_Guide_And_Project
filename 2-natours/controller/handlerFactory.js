@@ -61,6 +61,8 @@ module.exports.getAll = (model) =>
     let filterObj = {};
     if (req.params.tourId) filterObj = { tours: req.params.tourId };
 
+    console.log(await model.find(filterObj));
+
     // Execute query
     const features = new APIFeatures(model.find(filterObj), req.query)
       .filter()
