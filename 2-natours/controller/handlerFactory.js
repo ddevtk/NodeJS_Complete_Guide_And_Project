@@ -59,9 +59,7 @@ module.exports.getAll = (model) =>
   catchAsyncFn(async (req, res, next) => {
     // To allow nested route (GET reviews on specify tour)
     let filterObj = {};
-    if (req.params.tourId) filterObj = { tours: req.params.tourId };
-
-    console.log(await model.find(filterObj));
+    if (req.params.tourId) filterObj = { tour: req.params.tourId };
 
     // Execute query
     const features = new APIFeatures(model.find(filterObj), req.query)

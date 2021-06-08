@@ -1,5 +1,10 @@
 extends base
 
+block append head
+    link(href='https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css' rel='stylesheet')
+    script(src='https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js')
+
+
 mixin overviewBoxFacts(label, text,icon )
     .overview-box__detail
         svg.overview-box__icon
@@ -63,102 +68,32 @@ block content
                 img.picture-box__img(src=`/img/tours/${img}` alt=`The Park Camper Tour ${idx + 1}` class=`picture-box__img--${idx + 1}`)
 
     section.section-map
+        #map(data-locations=`${JSON.stringify(tour.locations)}`)
 
     section.section-reviews
         .reviews
+
             each review in tour.reviews
                 .reviews__card
                     .reviews__avatar
-                        img.reviews__avatar-img(src="/img/users/user-7.jpg" alt=`${}`)
-                        h6.reviews__user Laura Wilson
-                    p.reviews__text Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque dignissimos sint quo commodi corrupti accusantium veniam saepenumquam.
+                        img.reviews__avatar-img(src=`/img/users/${review.user[0].photo}` alt=`${review.user[0].name}`)
+                        h6.reviews__user= `${review.user[0].name}`
+                    p.reviews__text= `${review.review}`
                     .reviews__rating
-                        svg.reviews__star.reviews__star--active
-                            use(xlink:href="/img/icons.svg#icon-star")
-                        svg.reviews__star.reviews__star--active
-                            use(xlink:href="/img/icons.svg#icon-star")
-                        svg.reviews__star.reviews__star--active
-                            use(xlink:href="/img/icons.svg#icon-star")
-                        svg.reviews__star.reviews__star--active
-                            use(xlink:href="/img/icons.svg#icon-star")
-                        svg.reviews__star.reviews__star--active
-                            use(xlink:href="/img/icons.svg#icon-star")
-
-            .reviews__card
-                .reviews__avatar
-                    img.reviews__avatar-img(src="/img/users/user-14.jpg" alt="Laura Wilson")
-                    h6.reviews__user Laura Wilson
-                p.reviews__text Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque dignissimos sint quo commodi corrupti accusantium veniam saepenumquam.
-                .reviews__rating
-                    svg.reviews__star.reviews__star--active
-                        use(xlink:href="/img/icons.svg#icon-star")
-                    svg.reviews__star.reviews__star--active
-                        use(xlink:href="/img/icons.svg#icon-star")
-                    svg.reviews__star.reviews__star--active
-                        use(xlink:href="/img/icons.svg#icon-star")
-                    svg.reviews__star.reviews__star--active
-                        use(xlink:href="/img/icons.svg#icon-star")
-                    svg.reviews__star.reviews__star--inactive
-                        use(xlink:href="/img/icons.svg#icon-star")
-            .reviews__card
-                .reviews__avatar
-                    img.reviews__avatar-img(src="/img/users/user-15.jpg" alt="Laura Wilson")
-                    h6.reviews__user Laura Wilson
-                p.reviews__text Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque dignissimos sint quo commodi corrupti accusantium veniam saepenumquam.
-                .reviews__rating
-                    svg.reviews__star.reviews__star--active
-                        use(xlink:href="/img/icons.svg#icon-star")
-                    svg.reviews__star.reviews__star--active
-                        use(xlink:href="/img/icons.svg#icon-star")
-                    svg.reviews__star.reviews__star--active
-                        use(xlink:href="/img/icons.svg#icon-star")
-                    svg.reviews__star.reviews__star--active
-                        use(xlink:href="/img/icons.svg#icon-star")
-                    svg.reviews__star.reviews__star--inactive
-                        use(xlink:href="/img/icons.svg#icon-star")
-            .reviews__card
-                .reviews__avatar
-                    img.reviews__avatar-img(src="/img/users/user-15.jpg" alt="Laura Wilson")
-                    h6.reviews__user Laura Wilson
-                p.reviews__text Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque dignissimos sint quo commodi corrupti accusantium veniam saepenumquam.
-                .reviews__rating
-                    svg.reviews__star.reviews__star--active
-                        use(xlink:href="/img/icons.svg#icon-star")
-                    svg.reviews__star.reviews__star--active
-                        use(xlink:href="/img/icons.svg#icon-star")
-                    svg.reviews__star.reviews__star--active
-                        use(xlink:href="/img/icons.svg#icon-star")
-                    svg.reviews__star.reviews__star--active
-                        use(xlink:href="/img/icons.svg#icon-star")
-                    svg.reviews__star.reviews__star--inactive
-                        use(xlink:href="/img/icons.svg#icon-star")
-            .reviews__card
-                .reviews__avatar
-                    img.reviews__avatar-img(src="/img/users/user-15.jpg" alt="Laura Wilson")
-                    h6.reviews__user Laura Wilson
-                p.reviews__text Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque dignissimos sint quo commodi corrupti accusantium veniam saepenumquam.
-                .reviews__rating
-                    svg.reviews__star.reviews__star--active
-                        use(xlink:href="/img/icons.svg#icon-star")
-                    svg.reviews__star.reviews__star--active
-                        use(xlink:href="/img/icons.svg#icon-star")
-                    svg.reviews__star.reviews__star--active
-                        use(xlink:href="/img/icons.svg#icon-star")
-                    svg.reviews__star.reviews__star--active
-                        use(xlink:href="/img/icons.svg#icon-star")
-                    svg.reviews__star.reviews__star--inactive
-                        use(xlink:href="/img/icons.svg#icon-star")
+                        each star in [1,2,3,4,5]
+                            svg.reviews__star(class=`reviews__star${review.rating >= star ? '--active' : '--inactive'}`)
+                                use(xlink:href="/img/icons.svg#icon-star")
 
 
     section.section-cta
         .cta
             .cta__img.cta__img--logo
                 img(src="/img/logo-white.png" alt="Natours logo")
-            img.cta__img.cta__img--1(src="/img/tours/tour-5-2.jpg" alt="")
-            img.cta__img.cta__img--2(src="/img/tours/tour-5-1.jpg" alt="")
+            img.cta__img.cta__img--1(src=`/img/tours/${tour.images[1]}` alt="Tour photo")
+            img.cta__img.cta__img--2(src=`/img/tours/${tour.images[2]}` alt="Tour photo")
             .cta__content
                 h2.heading-secondary What are you waiting for ?
-                p.cta__text 10 days. 1 adventure. Infinite memories. Make it yours today!
+                p.cta__text= `${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`
                 button.btn.btn--green.span-all-rows Book tour now !
 
 
