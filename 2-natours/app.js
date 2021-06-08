@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
 
 const globalErrorHandler = require('./controller/errorController');
 const tourRouter = require('./routes/tourRoute');
@@ -44,6 +45,7 @@ app.use('/api', limiter);
 
 //  Body parser, reading data from body to req.body
 app.use(express.json({ limit: '10kb' }));
+app.use(cookieParser());
 
 // Data sanitization against NoSQL injection
 app.use(mongoSanitize());
@@ -68,6 +70,7 @@ app.use(
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   res.message = `created at ${new Date().getDay()}`;
+  // console.log(req.cookies);
   next();
 });
 

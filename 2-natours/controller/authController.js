@@ -6,7 +6,7 @@ const User = require('../model/userModel');
 const appError = require('../utils/appError');
 const catchAsyncFn = require('../utils/catchAsyncFn');
 const bcrypt = require('bcryptjs');
-const { token } = require('morgan');
+
 const sendEmail = require('../utils/email');
 
 const getToken = (id) => {
@@ -27,6 +27,8 @@ const sendToken = (res, statusCode, user) => {
   if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
 
   res.cookie('jwt', token, cookieOptions);
+
+  console.log(token);
 
   user.password = undefined;
 
@@ -50,6 +52,7 @@ module.exports.signup = catchAsyncFn(async (req, res, next) => {
 
   sendToken(res, 201, newUser);
 });
+
 exports.login = catchAsyncFn(async (req, res, next) => {
   // Check if email and password exist
   const { email, password } = req.body;
@@ -74,6 +77,11 @@ exports.protect = catchAsyncFn(async (req, res, next) => {
   if (headers.authorization && headers.authorization.startsWith('Bearer')) {
     token = headers.authorization.split(' ')[1];
   }
+  if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+
+  console.log(token);
 
   if (!token) {
     return next(
@@ -100,6 +108,36 @@ exports.protect = catchAsyncFn(async (req, res, next) => {
   }
   // Access to protected route
   req.user = currentUser;
+
+  next();
+});
+
+// check user is logged in
+exports.isLoggedIn = catchAsyncFn(async (req, res, next) => {
+  if (req.cookies.jwt) {
+    //  Verification token
+    const decoded = await promisify(jwt.verify)(
+      req.cookies.jwt,
+      process.env.JWT_SECRET
+    );
+    console.log(decoded);
+
+    //  Check if user still exists
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) {
+      return next();
+    }
+
+    //  Check if user changed password after the token was issue
+    if (currentUser.checkPasswordHasChanged(decoded.iat)) {
+      return next();
+    }
+    console.log(currentUser);
+    console.log(res.locals);
+    // There is a logged in user
+    res.locals.user = currentUser;
+    return next();
+  }
 
   next();
 });
