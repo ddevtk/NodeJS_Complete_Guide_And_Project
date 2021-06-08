@@ -112,35 +112,36 @@ exports.protect = catchAsyncFn(async (req, res, next) => {
   next();
 });
 
-// check user is logged in
-exports.isLoggedIn = catchAsyncFn(async (req, res, next) => {
-  if (req.cookies.jwt) {
-    //  Verification token
-    const decoded = await promisify(jwt.verify)(
-      req.cookies.jwt,
-      process.env.JWT_SECRET
-    );
-    console.log(decoded);
+// CHECK USER IS LOGGED IN
+exports.isLoggedIn = async (req, res, next) => {
+  try {
+    if (req.cookies.jwt) {
+      //  Verification token
+      const decoded = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+      );
 
-    //  Check if user still exists
-    const currentUser = await User.findById(decoded.id);
-    if (!currentUser) {
+      //  Check if user still exists
+      const currentUser = await User.findById(decoded.id);
+      if (!currentUser) {
+        return next();
+      }
+
+      //  Check if user changed password after the token was issue
+      if (currentUser.checkPasswordHasChanged(decoded.iat)) {
+        return next();
+      }
+
+      // There is a logged in user
+      res.locals.user = currentUser;
       return next();
     }
-
-    //  Check if user changed password after the token was issue
-    if (currentUser.checkPasswordHasChanged(decoded.iat)) {
-      return next();
-    }
-    console.log(currentUser);
-    console.log(res.locals);
-    // There is a logged in user
-    res.locals.user = currentUser;
-    return next();
+    next();
+  } catch (error) {
+    next();
   }
-
-  next();
-});
+};
 
 // " RESTRICT TO " FEATURE
 exports.restrictTo = (...roles) => {
@@ -195,6 +196,7 @@ exports.forgotPassword = catchAsyncFn(async (req, res, next) => {
   }
 });
 
+// RESET PASSWORD
 exports.resetPassword = catchAsyncFn(async (req, res, next) => {
   // 1) Get user by token and check passwordReset is not expired
   const hashedToken = crypto
@@ -220,6 +222,7 @@ exports.resetPassword = catchAsyncFn(async (req, res, next) => {
   sendToken(res, 200, user);
 });
 
+// UPDATE PASSWORD
 exports.updatePassword = catchAsyncFn(async (req, res, next) => {
   // 1) Get user from collection
   const currentUser = await User.findById(req.user._id).select('+password');
@@ -237,3 +240,14 @@ exports.updatePassword = catchAsyncFn(async (req, res, next) => {
   // 4) Send jwt
   sendToken(res, 200, currentUser);
 });
+
+// LOG OUT
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'logged out', {
+    expires: new Date(Date.now()) + 10000,
+    httpOnly: true,
+  });
+  res.status(200).json({
+    status: 'success',
+  });
+};
