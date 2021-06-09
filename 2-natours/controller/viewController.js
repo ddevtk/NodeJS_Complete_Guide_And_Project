@@ -1,6 +1,7 @@
 const catchAsyncFn = require('../utils/catchAsyncFn');
 const Tour = require('../model/tourModel');
 const appError = require('../utils/appError');
+const User = require('../model/userModel');
 
 exports.getOverview = catchAsyncFn(async (req, res, next) => {
   const tours = await Tour.find();
@@ -46,6 +47,27 @@ exports.getLoginForm = (req, res, next) => {
 
 exports.getAccount = (req, res) => {
   res.status(200).render('account', {
-    title: 'My Account',
+    title: 'Your Account',
   });
 };
+
+// UPDATE USER DATA WITHOUT API
+// exports.updateUserData = catchAsyncFn(async (req, res, next) => {
+//   console.log(req.body);
+//   const updateUser = await User.findByIdAndUpdate(
+//     req.user._id,
+//     {
+//       name: req.body.name,
+//       email: req.body.email,
+//     },
+//     {
+//       new: true,
+//       runValidators: true,
+//     }
+//   );
+
+//   res.status(200).render('account', {
+//     title: 'Your account',
+//     user: updateUser,
+//   });
+// });

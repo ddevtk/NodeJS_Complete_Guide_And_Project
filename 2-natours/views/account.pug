@@ -16,26 +16,7 @@ block content
                     + navItem('#', 'My bookings', 'briefcase',false)
                     + navItem('#', 'My reviews', 'star',false)
                     + navItem('#', 'Billing', 'credit-card',false)
-                    //- li.side-nav--active
-                    //- a(href='#')
-                    //-     svg
-                    //-     use(xlink:href='img/icons.svg#icon-settings')
-                    //-     | Settings
-                    //- li
-                    //- a(href='#')
-                    //-     svg
-                    //-     use(xlink:href='img/icons.svg#icon-briefcase')
-                    //-     | My bookings
-                    //- li
-                    //- a(href='#')
-                    //-     svg
-                    //-     use(xlink:href='img/icons.svg#icon-star')
-                    //-     | My reviews
-                    //- li
-                    //- a(href='#')
-                    //-     svg
-                    //-     use(xlink:href='img/icons.svg#icon-credit-card')
-                    //-     | Billing
+
                 - if(user.role === 'admin')
                     .admin-nav
                         h5.admin-nav__heading Admin
@@ -44,41 +25,27 @@ block content
                             + navItem('#', 'Manage users', 'users')
                             + navItem('#', 'Manage reviews', 'star')
                             + navItem('#', 'Manage bookings', 'briefcase')
-                            //- li
-                            //-     a(href='#')
-                            //-     svg
-                            //-         use(xlink:href='img/icons.svg#icon-map')
-                            //-     | Manage tours
-                            //- li
-                            //-     a(href='#')
-                            //-     svg
-                            //-         use(xlink:href='img/icons.svg#icon-users')
-                            //-     | Manage users
-                            //- li
-                            //-     a(href='#')
-                            //-     svg
-                            //-         use(xlink:href='img/icons.svg#icon-star')
-                            //-     | Manage reviews
-                            //- li
-                            //-     a(href='#')
-                            //-     svg
-                            //-         use(xlink:href='img/icons.svg#icon-briefcase')
 
             .user-view__content
                 .user-view__form-container
                     h2.heading-secondary.ma-bt-md Your account settings
+
+                    //- Without API
+                    //- form.form.form-user-data.form--data-user(action='/update-user-data' method= 'POST')
+
+                    //- With API
                     form.form.form-user-data
-                    .form__group
-                        label.form__label(for='name') Name
-                        input#name.form__input(type='text', value=`${user.name}`, required)
-                    .form__group.ma-bt-md
-                        label.form__label(for='email') Email address
-                        input#email.form__input(type='email', value=`${user.email}`, required)
-                    .form__group.form__photo-upload
-                        img.form__user-photo(src=`/img/users/${user.photo}`, alt='User photo')
-                        a.btn-text(href='') Choose new photo
-                    .form__group.right
-                        button.btn.btn--small.btn--green Save settings
+                        .form__group
+                            label.form__label(for='name') Name
+                            input#name.form__input(type='text', value=`${user.name}`, required, name='name')
+                        .form__group.ma-bt-md
+                            label.form__label(for='email') Email address
+                            input#email.form__input(type='email', value=`${user.email}`, required,name='email')
+                        .form__group.form__photo-upload
+                            img.form__user-photo(src=`/img/users/${user.photo}`, alt='User photo')
+                            a.btn-text(href='') Choose new photo
+                        .form__group.right
+                            button.btn.btn--small.btn--green Save settings
                 .line &nbsp;
                 .user-view__form-container
                     h2.heading-secondary.ma-bt-md Password change

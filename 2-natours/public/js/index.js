@@ -1,13 +1,16 @@
 import '@babel/polyfill';
+
 import { login, logout } from './login';
 import { displayMap } from './map';
+import { updateUserData } from './updateSettings';
 
 const mapEle = document.getElementById('map');
-const formEle = document.querySelector('.form');
+const formLogin = document.querySelector('.form--login');
 const logoutEle = document.getElementById('logout');
+const formUserDataUpdate = document.querySelector('.form-user-data');
 
-if (formEle)
-  formEle.addEventListener('submit', (e) => {
+if (formLogin)
+  formLogin.addEventListener('submit', (e) => {
     e.preventDefault();
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
@@ -21,4 +24,12 @@ if (mapEle) {
 }
 if (logoutEle) {
   logoutEle.addEventListener('click', logout);
+}
+if (formUserDataUpdate) {
+  formUserDataUpdate.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    updateUserData(name, email);
+  });
 }
