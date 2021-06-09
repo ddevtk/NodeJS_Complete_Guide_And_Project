@@ -108,6 +108,7 @@ exports.protect = catchAsyncFn(async (req, res, next) => {
   }
   // Access to protected route
   req.user = currentUser;
+  res.locals.user = currentUser;
 
   next();
 });
@@ -227,7 +228,6 @@ exports.updatePassword = catchAsyncFn(async (req, res, next) => {
   // 1) Get user from collection
   const currentUser = await User.findById(req.user._id).select('+password');
 
-  console.log(currentUser);
   // 2) Check if POSTed password is correct
   if (!(await bcrypt.compare(req.body.currentPassword, currentUser.password))) {
     return next(new appError('Incorrect password. Please check again', 401));
@@ -244,9 +244,10 @@ exports.updatePassword = catchAsyncFn(async (req, res, next) => {
 // LOG OUT
 exports.logout = (req, res) => {
   res.cookie('jwt', 'logged out', {
-    expires: new Date(Date.now()) + 10000,
+    expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
   });
+  console.log('hello');
   res.status(200).json({
     status: 'success',
   });

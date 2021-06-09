@@ -29,34 +29,51 @@ const tokenExpiredErrorHandler = () =>
   new appError('Your token is expired! Please login again !', 401);
 
 // Error with env = development
-const errorDev = (err, res) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    error: err,
-    message: err.message,
-    stack: err.stack,
+const errorDev = (err, req, res) => {
+  // API
+  if (req.originalUrl.startsWith('/api'))
+    return res.status(err.statusCode).json({
+      req,
+      status: err.status,
+      error: err,
+      message: err.message,
+      stack: err.stack,
+    });
+
+  res.status(err.statusCode).render('error', {
+    title: 'Some thing went wrong',
+    mes: err.message,
   });
 };
 
 // Error with env = production
-const errorProduct = (err, res) => {
-  // Operational Error
-  if (err.isOperational) {
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message,
-    });
-    // Programming Error
-  } else {
-    // 1) Log error to console
+const errorProduct = (err, req, res) => {
+  if (req.originalUrl.startsWith('/api')) {
+    if (err.isOperational) {
+      // Operational Error
+      return res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message,
+      });
+      // Programming Error
+    }
     console.error('ERROR 💥💥💥', err);
-
-    // 2) Send message
-    res.status(500).json({
+    return res.status(500).json({
       status: 'error',
       message: 'Some thing went wrong !!!',
     });
   }
+  if (err.isOperational) {
+    console.log(err);
+    return res.status(err.statusCode).render('error', {
+      title: 'Some thing went wrong',
+      mes: err.message,
+    });
+  }
+  return res.status(500).render('error', {
+    title: 'Some thing went wrong',
+    mes: 'Please try again',
+  });
 };
 
 // Error controller
@@ -65,9 +82,9 @@ module.exports = (err, req, res, next) => {
   err.status = err.status || 'error';
 
   if (process.env.NODE_ENV === 'development') {
-    errorDev(err, res);
+    errorDev(err, req, res);
   } else if (process.env.NODE_ENV === 'production') {
-    let error = { ...err };
+    let error = { ...err, message: err.message };
 
     if (err.name === 'CastError') {
       error = errorDBHandler(err);
@@ -86,6 +103,6 @@ module.exports = (err, req, res, next) => {
       error = tokenExpiredErrorHandler();
     }
 
-    errorProduct(error, res);
+    errorProduct(error, req, res);
   }
 };

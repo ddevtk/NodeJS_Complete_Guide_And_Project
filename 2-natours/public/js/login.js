@@ -28,6 +28,7 @@ export const logout = async () => {
       method: 'GET',
       url: 'http://127.0.0.1:8000/api/v1/users/logout',
     });
+    console.log(res);
     if (res.data.status === 'success') location.reload(true);
   } catch (error) {
     showAlert('error', 'Error logging out 💥💥💥. Please try again !!!');

@@ -20,5 +20,5 @@ if (mapEle) {
   displayMap(locArr);
 }
 if (logoutEle) {
-  logout();
+  logoutEle.addEventListener('click', logout);
 }

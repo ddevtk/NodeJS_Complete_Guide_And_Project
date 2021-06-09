@@ -1,5 +1,6 @@
 const catchAsyncFn = require('../utils/catchAsyncFn');
 const Tour = require('../model/tourModel');
+const appError = require('../utils/appError');
 
 exports.getOverview = catchAsyncFn(async (req, res, next) => {
   const tours = await Tour.find();
@@ -13,6 +14,12 @@ exports.getTour = catchAsyncFn(async (req, res, next) => {
     path: 'reviews',
     select: 'review user rating',
   });
+  console.log(tour);
+
+  if (!tour) {
+    return next(new appError('There is no tour with that name', 404));
+  }
+
   res
     .status(200)
     .set(
@@ -35,4 +42,10 @@ exports.getLoginForm = (req, res, next) => {
     .render('login', {
       title: 'Login to your account',
     });
+};
+
+exports.getAccount = (req, res) => {
+  res.status(200).render('account', {
+    title: 'My Account',
+  });
 };
