@@ -33,7 +33,6 @@ const errorDev = (err, req, res) => {
   // API
   if (req.originalUrl.startsWith('/api'))
     return res.status(err.statusCode).json({
-      req,
       status: err.status,
       error: err,
       message: err.message,

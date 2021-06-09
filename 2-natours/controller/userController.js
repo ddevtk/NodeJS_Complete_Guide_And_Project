@@ -1,7 +1,35 @@
 const User = require('../model/userModel');
+const multer = require('multer');
 const appError = require('../utils/appError');
 const catchAsyncFn = require('../utils/catchAsyncFn');
 const handlerFactory = require('./handlerFactory');
+
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/img/users');
+  },
+  filename: (req, file, cb) => {
+    const ext = file.mimetype.split('/')[1]; // extension
+    cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
+  },
+});
+const multerFiler = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(
+      new appError('Not an image! Please upload only image 🙏🙏🙏', 400),
+      false
+    );
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFiler,
+}).single('photo');
+
+exports.uploadUserPhoto = upload;
 
 // UPDATE USER'S DATA
 exports.updateMe = catchAsyncFn(async (req, res, next) => {
@@ -14,7 +42,6 @@ exports.updateMe = catchAsyncFn(async (req, res, next) => {
     );
   }
   const filterBodyHandler = (obj, ...allowedFields) => {
-    console.log(allowedFields);
     let allowObj = {};
     Object.keys(obj).forEach((el) => {
       if (allowedFields.includes(el)) allowObj[el] = obj[el];

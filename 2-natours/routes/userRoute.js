@@ -1,4 +1,5 @@
 const express = require('express');
+
 const authController = require('../controller/authController');
 const userController = require('../controller/userController');
 
@@ -9,12 +10,17 @@ router.get('/logout', authController.logout);
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
+
 // PROTECT ROUTES IF USER IS NOT LOGGED IN
 router.use(authController.protect);
 
 router.patch('/updatePassword', authController.updatePassword);
 router.get('/me', userController.getMe, userController.getUser);
-router.patch('/updateMe', userController.updateMe);
+router.patch(
+  '/updateMe',
+  userController.uploadUserPhoto,
+  userController.updateMe
+);
 router.patch('/deleteMe', userController.deleteMe);
 
 // ONLY ADMIN CAN ACCESS THE ROUTES BELOW
