@@ -2,6 +2,7 @@ const catchAsyncFn = require('../utils/catchAsyncFn');
 const Tour = require('../model/tourModel');
 const appError = require('../utils/appError');
 const User = require('../model/userModel');
+const Booking = require('../model/bookingModel');
 
 exports.getOverview = catchAsyncFn(async (req, res, next) => {
   const tours = await Tour.find();
@@ -50,6 +51,19 @@ exports.getAccount = (req, res) => {
     title: 'Your Account',
   });
 };
+
+exports.getMyTours = catchAsyncFn(async (req, res, next) => {
+  const bookings = await Booking.find({ user: req.user.id });
+
+  const tourIDs = bookings.map((booking) => booking.tour);
+
+  const tours = await Tour.find(_id: {$in: tourIDs})
+
+  res.status(200).render('overview', {
+    title: 'My tours',
+    tours
+  })
+});
 
 // UPDATE USER DATA WITHOUT API
 // exports.updateUserData = catchAsyncFn(async (req, res, next) => {

@@ -1,5 +1,3 @@
-
-
 export const displayMap = (locArr) => {
   mapboxgl.accessToken =
     'pk.eyJ1IjoiZGRldmsiLCJhIjoiY2twbnJ4MzYyMjMxbDJ2bzhqdDNxeGpuOSJ9.H5CYIoW16i7A4NI4ht76ng';
