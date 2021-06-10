@@ -3,6 +3,7 @@ doctype html
 html
     head
         block head
+            meta(http-equiv="Content-Security-Policy" content="default-src 'self' gap:; script-src 'self' data: https://ssl.gstatic.com 'unsafe-eval'; object-src *; style-src 'self' data: 'unsafe-inline'; img-src 'self' data:; media-src 'self' data:; font-src 'self' data:; connect-src *")
             meta(charset="UTF-8")
             meta(name="viewport" content="width=device-width, initial-scale=1.0")
             link(rel="stylesheet" href="/css/style.css")
@@ -22,10 +23,7 @@ html
         // FOOTER
         include _footer
 
-
-        //- script(src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js")
-        //- script(src="/js/map.js")
-        //- script(src="/js/login.js")
+        script(src='https://js.stripe.com/v3/')
         script(src="/js/bundle.js")
 
 
