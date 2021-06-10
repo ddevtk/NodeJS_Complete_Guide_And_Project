@@ -1,13 +1,12 @@
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 const crypto = require('crypto');
-const app = require('../app');
 const User = require('../model/userModel');
 const appError = require('../utils/appError');
 const catchAsyncFn = require('../utils/catchAsyncFn');
 const bcrypt = require('bcryptjs');
 
-const sendEmail = require('../utils/email');
+const Email = require('../utils/email');
 
 const getToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -49,6 +48,8 @@ module.exports.signup = catchAsyncFn(async (req, res, next) => {
     confirmPassword: req.body.confirmPassword,
     // passwordChangedAt: req.body.passwordChangedAt,
   });
+  const url = `${req.protocol}://${req.get('host')}/me`;
+  await new Email(newUser, url).sendWelcome();
 
   sendToken(res, 201, newUser);
 });
@@ -80,8 +81,6 @@ exports.protect = catchAsyncFn(async (req, res, next) => {
   if (req.cookies.jwt) {
     token = req.cookies.jwt;
   }
-
-  console.log(token);
 
   if (!token) {
     return next(
@@ -175,11 +174,11 @@ exports.forgotPassword = catchAsyncFn(async (req, res, next) => {
   const message = `Forgot your password? Submit request with new password and confirmPassword to: ${resetURL}\n. If you don't forget your password, please ignore this email.`;
 
   try {
-    await sendEmail({
-      email: user.email,
-      subject: 'Your password reset token ( valid in 10 minutes )',
-      message,
-    });
+    // await sendEmail({
+    //   email: user.email,
+    //   subject: 'Your password reset token ( valid in 10 minutes )',
+    //   message,
+    // });
     res.status(200).json({
       status: 'success',
       message: 'Token send to email',
