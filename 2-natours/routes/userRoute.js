@@ -10,7 +10,6 @@ router.get('/logout', authController.logout);
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
-
 // PROTECT ROUTES IF USER IS NOT LOGGED IN
 router.use(authController.protect);
 
@@ -19,6 +18,7 @@ router.get('/me', userController.getMe, userController.getUser);
 router.patch(
   '/updateMe',
   userController.uploadUserPhoto,
+  userController.resizeUserPhoto,
   userController.updateMe
 );
 router.patch('/deleteMe', userController.deleteMe);

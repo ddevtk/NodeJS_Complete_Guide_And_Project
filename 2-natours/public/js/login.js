@@ -18,8 +18,8 @@ export const login = async (email, password) => {
         location.assign('/');
       }, 0);
     }
-  } catch (err) {
-    showAlert('error', 'Incorrect email or password 💥💥💥');
+  } catch (error) {
+    showAlert('error', error.response.data.message);
   }
 };
 
@@ -29,8 +29,7 @@ export const logout = async () => {
       method: 'GET',
       url: 'http://127.0.0.1:8000/api/v1/users/logout',
     });
-    console.log(res);
-    if (res.data.status === 'success') location.reload(true);
+    if (res.data.status === 'success') location.assign('/');
   } catch (error) {
     showAlert('error', 'Error logging out 💥💥💥. Please try again !!!');
   }

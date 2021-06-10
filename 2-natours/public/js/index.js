@@ -27,11 +27,16 @@ if (logoutEle) {
   logoutEle.addEventListener('click', logout);
 }
 if (formUserDataUpdate) {
-  formUserDataUpdate.addEventListener('submit', (e) => {
+  formUserDataUpdate.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    updateSettings({ name, email }, 'data');
+    const formData = new FormData();
+    formData.append('name', document.getElementById('name').value);
+    formData.append('email', document.getElementById('email').value);
+    formData.append('photo', document.getElementById('photo').files[0]);
+
+    await updateSettings(formData, 'data');
+
+    location.reload();
   });
 }
 if (formUserSettings) {
