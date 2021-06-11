@@ -53,7 +53,6 @@ exports.resizeTourPhoto = catchAsyncFn(async (req, res, next) => {
       let tourImageFilename = `tour-${req.params.id}-${Date.now()}-${
         idx + 1
       }.jpeg`;
-      console.log(tourImageFilename);
 
       await sharp(image.buffer)
         .resize(2000, 1300)
@@ -65,7 +64,6 @@ exports.resizeTourPhoto = catchAsyncFn(async (req, res, next) => {
     })
   );
 
-  console.log(req.body.images);
 
   next();
 });
@@ -166,7 +164,6 @@ module.exports.getToursWithin = catchAsyncFn(async (req, res, next) => {
 });
 
 exports.getDistances = catchAsyncFn(async (req, res, next) => {
-  console.log(req.params);
   const { latlng, unit } = req.params;
   const [lat, lng] = latlng.split(',');
   if (!lat || !lng)

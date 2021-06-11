@@ -16,7 +16,6 @@ exports.getTour = catchAsyncFn(async (req, res, next) => {
     path: 'reviews',
     select: 'review user rating',
   });
-  console.log(tour);
 
   if (!tour) {
     return next(new appError('There is no tour with that name', 404));
@@ -57,12 +56,12 @@ exports.getMyTours = catchAsyncFn(async (req, res, next) => {
 
   const tourIDs = bookings.map((booking) => booking.tour);
 
-  const tours = await Tour.find(_id: {$in: tourIDs})
+  const tours = await Tour.find({ _id: { $in: tourIDs } });
 
   res.status(200).render('overview', {
     title: 'My tours',
-    tours
-  })
+    tours,
+  });
 });
 
 // UPDATE USER DATA WITHOUT API

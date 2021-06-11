@@ -1,5 +1,7 @@
 const Tour = require('../model/tourModel');
 const catchAsyncFn = require('../utils/catchAsyncFn');
+const handlerFactory = require('./handlerFactory');
+const Booking = require('../model/bookingModel');
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
@@ -42,3 +44,9 @@ exports.createBookingCheckout = catchAsyncFn(async (req, res, next) => {
 
   res.redirect(req.originalUrl.split('?')[0]);
 });
+
+exports.getAllBookings = handlerFactory.getAll(Booking);
+exports.getBooking = handlerFactory.getOne(Booking);
+exports.createBooking = handlerFactory.createOne(Booking);
+exports.updateBooking = handlerFactory.updateOne(Booking);
+exports.deleteBooking = handlerFactory.deleteOne(Booking);

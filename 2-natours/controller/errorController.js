@@ -63,7 +63,6 @@ const errorProduct = (err, req, res) => {
     });
   }
   if (err.isOperational) {
-    console.log(err);
     return res.status(err.statusCode).render('error', {
       title: 'Some thing went wrong',
       mes: err.message,

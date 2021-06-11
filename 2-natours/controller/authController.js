@@ -27,7 +27,6 @@ const sendToken = (res, statusCode, user) => {
 
   res.cookie('jwt', token, cookieOptions);
 
-  console.log(token);
 
   user.password = undefined;
 
@@ -159,7 +158,6 @@ exports.restrictTo = (...roles) => {
 exports.forgotPassword = catchAsyncFn(async (req, res, next) => {
   // 1) Get user by POSTED email
   const user = await User.findOne({ email: req.body.email });
-  console.log(user);
   if (!user) {
     return next(new appError('There is no user with this email address ', 404));
   }

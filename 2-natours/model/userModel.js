@@ -71,7 +71,6 @@ userSchema.pre(/^find/, function (next) {
 // CREATE METHODS IN DOCS
 userSchema.methods.checkPasswordHasChanged = function (JWTimestamp) {
   if (this.passwordChangedAt) {
-    console.log(this.passwordChangedAt.getTime() / 1000, JWTimestamp);
     return JWTimestamp < this.passwordChangedAt.getTime() / 1000;
   }
   return false;
